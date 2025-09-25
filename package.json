@@ -1,0 +1,24 @@
+{
+  "name": "cts-capstone-book-management",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rinigrace123/cts-capstone-book-management.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rinigrace123/cts-capstone-book-management/issues"
+  },
+  "homepage": "https://github.com/rinigrace123/cts-capstone-book-management#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "mongoose": "^8.18.2"
+  }
+}
