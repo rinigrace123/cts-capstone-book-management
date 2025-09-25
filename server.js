@@ -31,6 +31,7 @@ connect(`mongodb://${dbConfig.HOST}:${dbConfig.PORT}/${dbConfig.DB}`,{
     process.exit()
 })
 
+require("./src/routes/book.routes")(app)
 const PORT = process.env.PORT || 8080;
 app.listen(PORT,()=>{
     console.log(`Server is running on port ${PORT}`)
