@@ -1,5 +1,5 @@
 const controller = require ("../controllers/book.controller");
-const {title,author,date,genre, description,} = require('../utils/validator')
+const {title,author,date,genre, description, rating, comments, bookId,} = require('../utils/validator')
 const pathUrl = "/api/books"
 
 const validate = validations =>{
@@ -20,4 +20,10 @@ module.exports = function(app){
         controller.addBook);
 
     app.get(pathUrl,controller.getBooks)
+
+    app.delete("/api/books/:id",controller.deleteBook)
+
+    app.post("/api/books/:id/reviews",
+        validate([rating,comments,bookId]),
+        controller.addReviews)
 }

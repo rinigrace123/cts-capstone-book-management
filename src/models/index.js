@@ -7,4 +7,6 @@ db.mongoose = mongoose;
 
 db.Book = require("./book.model")
 
+db.Review = require("./review.model")
+
 module.exports = db; 

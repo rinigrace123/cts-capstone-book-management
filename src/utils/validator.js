@@ -1,4 +1,4 @@
-const { body } = require('express-validator');
+const { body , param} = require('express-validator');
 const moment = require('moment');
 const {Book} = require("../models")
 
@@ -38,4 +38,10 @@ exports.date =  body('date').notEmpty().withMessage('Date cannot be empty').cust
     })
 
 exports.genre = body('genre').notEmpty().withMessage('Genre cannot be empty').isIn(genreArray).withMessage('Genere is not present in the list')
+
+exports.rating = body('rating').notEmpty().withMessage('Rating cannot be empty').isNumeric().withMessage('Rating must be a number')
+
+exports.comments = body('comments').notEmpty().withMessage('Comment can not be empty').isLength({ max: 100 }).withMessage('Review cannot exceed 100 characters')
+
+exports.bookId = param('id').notEmpty().isNumeric().withMessage('Id must be a number')
 
