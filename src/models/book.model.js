@@ -6,7 +6,7 @@ const Book = mongoose.model(
         title:String,
         author:String,
         genre:String,
-        year:Number,
+        date:Date,
         description:String,
     })
 );

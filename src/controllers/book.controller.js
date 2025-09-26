@@ -1,37 +1,31 @@
-const db = require("../models")
-const Book = db.Book
-//Save books
-exports.addBook = (request, response) => {
-  if (!request.body.title.trim()) {
-    response.status(400).send({ message: "Title can not be empty" });
-    return;
-  }
-  const book = new Book({
-    title: request.body.title.trim(),
-    author: request.body.author.trim(),
-    genre: request.body.genre.trim(),
-    year: request.body.year.trim(),
-    description: request.body.description.trim()
-  })
-  book
-    .save(book)
-    .then(data => {
-      response.send(data);
-    })
-    .catch(error => {
-      response.status(500).send({
-        message:
-          error.message || "Some error occurred while adding the books."
-      });
+const db = require("../models");
+const Book = db.Book;
+
+exports.addBook = async (request, response) => {
+  const bookData = request.body;
+
+  try {
+    const book = new Book({
+      title: bookData.title.trim(),
+      author: bookData.author.trim(),
+      genre: bookData.genre.trim(),
+      date: bookData.date.trim(),
+      description: bookData.description.trim()
     });
+
+    const savedBook = await book.save();
+    response.send(savedBook);
+  } catch (error) {
+    response.status(500).send({
+      message: error.message || "Some error occurred while adding the book."
+    });
+  }
 };
 
-//Get all the books
-exports.getBooks = (request, response) => {
-  const title = request.query.title;
-  var condition = title ? { title: { $regex: new RegExp(title), $options: "i" } } : {};
 
-  Book.find(condition)
+//Get all the books
+exports.getBooks = (_, response) => {
+  Book.find({})
     .then(data => {
       response.send(data);
     })
