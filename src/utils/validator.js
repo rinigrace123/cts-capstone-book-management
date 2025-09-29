@@ -39,9 +39,11 @@ exports.date =  body('date').notEmpty().withMessage('Date cannot be empty').cust
 
 exports.genre = body('genre').notEmpty().withMessage('Genre cannot be empty').isIn(genreArray).withMessage('Genere is not present in the list')
 
-exports.rating = body('rating').notEmpty().withMessage('Rating cannot be empty').isNumeric().withMessage('Rating must be a number')
+exports.rating = body('rating')
+  .notEmpty().withMessage('Rating cannot be empty')
+  .isNumeric().withMessage('Rating must be a number')
+  .isFloat({ min: 1, max: 10 }).withMessage('Rating must be between 1 and 10');
 
 exports.comments = body('comments').notEmpty().withMessage('Comment can not be empty').isLength({ max: 100 }).withMessage('Review cannot exceed 100 characters')
 
-exports.bookId = param('id').notEmpty().isNumeric().withMessage('Id must be a number')
 
