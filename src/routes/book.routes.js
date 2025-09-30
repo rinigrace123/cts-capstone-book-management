@@ -1,5 +1,6 @@
 const controller = require("../controllers/book.controller");
 const { title, author, date, genre, description, rating, comments } = require('../utils/validator')
+const { verifyToken, isAdmin } = require("../middlewares/authJwt");
 const pathUrl = "/api/books"
 
 const validate = validations => {
@@ -14,14 +15,19 @@ const validate = validations => {
     };
 };
 module.exports = function (app) {
-    //Post call to save books
-    app.post(pathUrl,
+
+    app.post(pathUrl, verifyToken,
         validate([title, author, date, genre, description]),
         controller.addBook);
 
-    app.get(pathUrl, controller.getBooks)
+    app.get(pathUrl, verifyToken, controller.getBooks)
 
-    app.delete(`${pathUrl}/:id`, controller.deleteBook)
+    app.get(`${pathUrl}/:id`, controller.getBookById)
+
+    app.delete(`${pathUrl}/:id`, isAdmin, controller.deleteBook)
+
+    app.put(`${pathUrl}/:id`, verifyToken, isAdmin, controller.editBookById)
+
 
     app.post(`${pathUrl}/:id/reviews`,
         validate([rating, comments]),
@@ -30,7 +36,7 @@ module.exports = function (app) {
     app.get(`${pathUrl}/:id/reviews`,
         controller.getReviews)
 
-    app.delete(`${pathUrl}/reviews/:id`, controller.deleteReview)
+    app.delete(`${pathUrl}/reviews/:id`, verifyToken, controller.deleteReview)
 
-    app.put(`${pathUrl}/reviews/:id`, validate([rating, comments]), controller.editReview);
+    app.put(`${pathUrl}/reviews/:id`, verifyToken, validate([rating, comments]), controller.editReview);
 }

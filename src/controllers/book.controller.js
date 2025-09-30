@@ -25,7 +25,7 @@ exports.addBook = async (request, response) => {
 
 
 //Get all the books
-exports.getBooks = async (_, response) => {
+exports.getBooks = async (request, response) => {
   try {
     const data = await Book.find({})
     response.send(data);
@@ -33,6 +33,25 @@ exports.getBooks = async (_, response) => {
     response.status(500).send({
       message:
         err.message || "Some error occurred while retrieving books."
+    });
+  }
+};
+
+exports.getBookById = async (request, response) => {
+  try {
+    const id = request.params.id;
+
+    const data = await Book.findById(id);
+
+    if (!data) {
+      return response.status(404).send({ message: "Book not found" });
+    }
+
+    response.status(200).send(data);
+  } catch (error) {
+    console.error("Error fetching book by ID:", error);
+    response.status(500).send({
+      message: error.message || "Some error occurred while retrieving the book."
     });
   }
 };
@@ -141,4 +160,38 @@ exports.editReview = async (request, response) => {
   }
 };
 
+exports.editBookById = async (request, response) => {
+  try {
+    const bookId = request.params.id;
 
+    if (!bookId) {
+      return response.status(400).send({ message: "No book ID provided." });
+    }
+
+    const updateFields = {};
+
+    for (const key of Object.keys(request.body)) {
+      updateFields[key] = request.body[key];
+    }
+
+    const updatedBook = await Book.findByIdAndUpdate(
+      bookId,
+      updateFields,
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedBook) {
+      return response.status(404).send({ message: "Book not found." });
+    }
+
+    response.status(200).send({
+      message: "Book updated successfully.",
+      data: updatedBook
+    });
+  } catch (error) {
+    console.error("Error updating book:", error);
+    response.status(500).send({
+      message: error.message || "An error occurred while updating the book."
+    });
+  }
+};
