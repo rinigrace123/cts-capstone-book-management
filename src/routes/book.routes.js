@@ -28,15 +28,4 @@ module.exports = function (app) {
 
     app.put(`${pathUrl}/:id`, verifyToken, isAdmin, controller.editBookById)
 
-
-    app.post(`${pathUrl}/:id/reviews`,
-        validate([rating, comments]),
-        controller.addReviews)
-
-    app.get(`${pathUrl}/:id/reviews`,
-        controller.getReviews)
-
-    app.delete(`${pathUrl}/reviews/:id`, verifyToken, controller.deleteReview)
-
-    app.put(`${pathUrl}/reviews/:id`, verifyToken, validate([rating, comments]), controller.editReview);
 }

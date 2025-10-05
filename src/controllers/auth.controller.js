@@ -1,5 +1,6 @@
 const config = require("../config/auth.config");
 const db = require("../models");
+const validatePassword = require("../utils/passwordValidator")
 const User = db.user;
 const Role = db.role;
 
@@ -11,14 +12,11 @@ exports.signup = async (request, response) => {
     const userss = request.username
     console.log(userss)
     const { username, email, password, roles } = request.body;
-
-    // const user = new User({
-    //   username,
-    //   email,
-    //   password: bcrypt.hashSync(password, 8)
-    // });
-
-    // const savedUser = await user.save();
+    
+    const validation = validatePassword(password);
+    if (!validation.valid) {
+      return response.status(400).send({ message: validation.message });
+    }
 
     let assignedRoles = [];
 
@@ -116,6 +114,54 @@ exports.getAllUsers = async (request, response) => {
     });
   }
 };
+
+exports.deleteUsers = async (request,response) => {
+  const userId = request.params.id
+   try {
+    const deletedReview = await User.findByIdAndDelete(userId);
+
+    if (!deletedReview) {
+      return response.status(404).json({ message: 'User not found.' });
+    }
+
+    response.status(200).json({ message: 'User deleted successfully.' });
+  } catch (error) {
+    console.error('Error deleting User:', error);
+    response.status(500).json({ message: 'Server error while deleting user.' });
+  }
+}
+
+exports.editUsers = async (request, response) => {
+  const userId = request.params.id;
+
+  try {
+    if (!userId || !request.body) {
+      return response.status(400).send({ message: "Invalid request data" });
+    }
+
+     const updateFields = {};
+
+    for (const key of Object.keys(request.body)) {
+      updateFields[key] = request.body[key];
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      updateFields
+    );
+
+    if (!updatedUser) {
+      return response.status(404).send({ message: "User not found" });
+    }
+
+    response.status(200).send(updatedUser);
+  } catch (error) {
+    response.status(500).send({
+      message: error.message || "Error updating user"
+    });
+  }
+};
+
 
 
 

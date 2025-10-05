@@ -12,13 +12,16 @@ module.exports = function(app) {
 
   app.post(
     "/api/register",
-    [ verifySignUp.checkForUsernameOrEmail,
-      // verifySignUp.checkIfRolesExisted
-    ],
+    [ verifySignUp.checkForUsernameOrEmail],
     controller.signup
   );
 
   app.post("/api/login", controller.signin);
 
   app.get("/api/admin/users",verifyToken,isAdmin,controller.getAllUsers)
+
+  app.delete("/api/admin/users/:id",verifyToken,isAdmin,controller.deleteUsers)
+
+  app.put("/api/admin/users/:id",verifyToken,isAdmin,controller.editUsers)
+
 };
