@@ -18,8 +18,6 @@ exports.title = body('title')
   .withMessage('Title cannot be empty')
   .bail().custom(checkDuplicateTitles)
 
-exports.author = body('author').notEmpty().withMessage('Author is required')
-
 exports.description = body('description').notEmpty().withMessage('Description can not be empty').isLength({ max: 100 }).withMessage('Description cannot exceed 100 characters')
 
 exports.date =  body('date').notEmpty().withMessage('Date cannot be empty').custom((value) => {

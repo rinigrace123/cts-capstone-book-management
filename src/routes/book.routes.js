@@ -1,5 +1,5 @@
 const controller = require("../controllers/book.controller");
-const { title, author, date, genre, description, rating, comments } = require('../utils/validator')
+const { title, date, genre, description } = require('../utils/validator')
 const { verifyToken, isAdmin } = require("../middlewares/authJwt");
 const pathUrl = "/api/books"
 
@@ -17,7 +17,7 @@ const validate = validations => {
 module.exports = function (app) {
 
     app.post(pathUrl, verifyToken,
-        validate([title, author, date, genre, description]),
+        validate([title, date, genre, description]),
         controller.addBook);
 
     app.get(pathUrl, verifyToken, controller.getBooks)

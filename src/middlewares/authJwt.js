@@ -13,7 +13,7 @@ const verifyToken = (request, response, next) => {
 
   jwt.verify(token, config.secret, (err, decoded) => {
     if (err) {
-      return response.status(401).send({ message: "Unauthorized user" });
+      return response.status(401).send({ message: "Token expired" });
     }
 
     request.userId = decoded.id;

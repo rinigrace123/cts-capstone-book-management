@@ -76,7 +76,7 @@ exports.signin = async (request, response) => {
     const token = jwt.sign(
       { id: user._id },
       config.secret,
-      { expiresIn: "1d" }
+      { expiresIn: "5m" }
     );
 
     // const roles = user.roles.map(role => "ROLE_" + role.name.toUpperCase());
@@ -135,32 +135,48 @@ exports.editUsers = async (request, response) => {
   const userId = request.params.id;
 
   try {
-    if (!userId || !request.body) {
-      return response.status(400).send({ message: "Invalid request data" });
+    // Check if user ID is provided
+    if (!userId) {
+      return response.status(400).send({ message: "User ID is required" });
     }
 
-     const updateFields = {};
+    // Check if user exists
+    const existingUser = await User.findById(userId);
+    if (!existingUser) {
+      return response.status(404).json({ message: "User not found" });
+    }
 
+    // Check if request body is valid
+    if (!request.body || Object.keys(request.body).length === 0) {
+      return response.status(400).send({ message: "Request body is empty" });
+    }
+
+    // Validate password if present
+    if (request.body.password) {
+      const validation = validatePassword(request.body.password);
+      if (!validation.valid) {
+        return response.status(400).send({ message: validation.message });
+      }
+    }
+
+    // Prepare update fields
+    const updateFields = {};
     for (const key of Object.keys(request.body)) {
       updateFields[key] = request.body[key];
     }
 
-    const updatedUser = await User.findByIdAndUpdate(
-      userId,
-      updateFields
-    );
-
-    if (!updatedUser) {
-      return response.status(404).send({ message: "User not found" });
-    }
+    const updatedUser = await User.findByIdAndUpdate(userId, updateFields, { new: true });
 
     response.status(200).send(updatedUser);
   } catch (error) {
+    console.error("Error updating user:", error);
     response.status(500).send({
       message: error.message || "Error updating user"
     });
   }
 };
+
+
 
 
 

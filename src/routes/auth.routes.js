@@ -22,6 +22,8 @@ module.exports = function(app) {
 
   app.delete("/api/admin/users/:id",verifyToken,isAdmin,controller.deleteUsers)
 
-  app.put("/api/admin/users/:id",verifyToken,isAdmin,controller.editUsers)
+  app.put("/api/admin/users/:id",verifyToken,isAdmin,
+    [verifySignUp.checkForDuplicateUsernameorEmail],
+    controller.editUsers)
 
 };

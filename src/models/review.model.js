@@ -8,6 +8,11 @@ const Reviews = mongoose.model(
       ref: "Book",
       required: true
     },
+      userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true
+    },
         rating:Number,
         comment:String,
     })

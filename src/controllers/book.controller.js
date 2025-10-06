@@ -12,7 +12,7 @@ exports.addBook = async (request, response) => {
 
     const book = new Book({
       title: bookData.title?.trim(),
-      author: bookData.author?.trim(),
+      author: request.userId,
       genre: bookData.genre?.trim(),
       date: bookData.date?.trim(),
       description: bookData.description?.trim()

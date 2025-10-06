@@ -17,11 +17,11 @@ const validate = validations => {
 module.exports = function (app) {
 
 
-    app.post(`${pathUrl}/:id/reviews`,
+    app.post(`${pathUrl}/:id/reviews`,verifyToken,
         validate([rating, comments]),
         controller.addReviews)
 
-    app.get(`${pathUrl}/:id/reviews`,
+    app.get(`${pathUrl}/:id/reviews`,verifyToken,
         controller.getReviews)
 
     app.delete(`${pathUrl}/reviews/:id`, verifyToken, controller.deleteReview)

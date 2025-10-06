@@ -6,6 +6,7 @@ exports.addReviews = async (request, response) => {
   const reviewData = request.body;
   try {
     const review = new Reviews({
+      userId:request.userId,
       bookId: request.params.id,
       rating: reviewData.rating,
       comment: reviewData.comments,
@@ -41,15 +42,22 @@ exports.getReviews = async (request, response) => {
 //Delete Review for book
 exports.deleteReview = async (request, response) => {
   const reviewId = request.params.id;
-  console.log(reviewId)
 
   try {
-    const deletedReview = await Reviews.findByIdAndDelete(reviewId);
+    if (!request.userId) {
+      return response.status(401).json({ message: 'User ID missing.' });
+    }
 
-    if (!deletedReview) {
+    const review = await Reviews.findById(reviewId);
+    if (!review) {
       return response.status(404).json({ message: 'Review not found.' });
     }
 
+    if (review.author !== request.userId) {
+      return response.status(403).json({ message: 'You can only delete reviews created by you.' });
+    }
+
+    await Reviews.findByIdAndDelete(reviewId);
     response.status(200).json({ message: 'Review deleted successfully.' });
   } catch (error) {
     console.error('Error deleting review:', error);
@@ -61,19 +69,20 @@ exports.deleteReview = async (request, response) => {
 exports.editReview = async (request, response) => {
   const reviewId = request.params.id;
   const updatedData = request.body;
+  const currentUserId = request.userId; 
 
   try {
-    const updatedReview = await Reviews.findByIdAndUpdate(
-      reviewId,
-      {
-        rating: updatedData.rating,
-        comment: updatedData.comments,
-      },
-    );
+    const review = await Reviews.findById(reviewId);
 
-    if (!updatedReview) {
+    if (!review) {
       return response.status(404).json({ message: 'Review not found.' });
     }
+    if (review.userId.toString() !== currentUserId) {
+      return response.status(403).json({ message: 'You are not authorized to edit this review.' });
+    }
+    review.rating = updatedData.rating;
+    review.comment = updatedData.comments;
+    const updatedReview = await review.save();
 
     response.status(200).json(updatedReview);
   } catch (error) {
