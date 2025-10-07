@@ -1,4 +1,4 @@
-const config = require("../config/auth.config");
+const config = process.env.secret
 const db = require("../models");
 const validatePassword = require("../utils/passwordValidator")
 const User = db.user;
@@ -75,7 +75,7 @@ exports.signin = async (request, response) => {
 
     const token = jwt.sign(
       { id: user._id },
-      config.secret,
+      config,
       { expiresIn: "5m" }
     );
 
