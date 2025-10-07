@@ -42,7 +42,6 @@ exports.getReviews = async (request, response) => {
 //Delete Review for book
 exports.deleteReview = async (request, response) => {
   const reviewId = request.params.id;
-
   try {
     if (!request.userId) {
       return response.status(401).json({ message: 'User ID missing.' });
@@ -53,7 +52,7 @@ exports.deleteReview = async (request, response) => {
       return response.status(404).json({ message: 'Review not found.' });
     }
 
-    if (review.author !== request.userId) {
+    if (review.userId.toString() !== request.userId) {
       return response.status(403).json({ message: 'You can only delete reviews created by you.' });
     }
 
