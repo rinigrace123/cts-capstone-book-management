@@ -5,6 +5,9 @@ const dbConfig = require("./src/config/db.config");
 
 const app = express();
 
+require("dotenv").config();
+global.__basedir = __dirname;
+
 var corsOptions={
     origin:"http://localhost:8081"
 }
@@ -34,6 +37,7 @@ connect(`mongodb://${dbConfig.HOST}:${dbConfig.PORT}/${dbConfig.DB}`,{
 require("./src/routes/book.routes")(app)
 require("./src/routes/auth.routes")(app);
 require("./src/routes/review.routes")(app);
+require("./src/routes/files.route")(app)
 
 const PORT = process.env.PORT || 8080;
 app.listen(PORT,()=>{

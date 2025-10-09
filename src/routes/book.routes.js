@@ -20,7 +20,7 @@ module.exports = function (app) {
         validate([title, date, genre, description]),
         controller.addBook);
 
-    app.get(pathUrl, verifyToken, controller.getBooks)
+    app.get(pathUrl, controller.getBooks)
 
     app.get(`${pathUrl}/:id`, controller.getBookById)
 
