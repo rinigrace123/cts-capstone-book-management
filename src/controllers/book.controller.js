@@ -1,6 +1,7 @@
 const db = require("../models");
 const Book = db.Book;
 const Reviews = db.Review;
+const redisClient = require("../utils/redis"); 
 
 exports.addBook = async (request, response) => {
   try {
@@ -27,26 +28,25 @@ exports.addBook = async (request, response) => {
   }
 };
 
+
 exports.getBooks = async (request, response) => {
   try {
-    const books = await Book.find({});
+    const cachedBooks = await redisClient.get("books");
 
-    // Fetch reviews for each book
-    const booksWithReviews = await Promise.all(
-      books.map(async (book) => {
-        const reviews = await Reviews.find({ bookId: book._id });
-        return {
-          ...book.toObject(),
-          reviews
-        };
-      })
-    );
+    if (cachedBooks) {
+      return response.status(200).json(JSON.parse(cachedBooks));
+    }
 
-    response.send(booksWithReviews);
-  } catch (err) {
-    response.status(500).send({
-      message: err.message || "Some error occurred while retrieving books."
+    const books = await Book.find();
+
+    await redisClient.set("books", JSON.stringify(books), {
+      EX: 3600, // expire in 1 hour
     });
+
+    response.status(200).json(books);
+  } catch (error) {
+    console.error("Error in getBooks:", error);
+    response.status(500).json({ message: error.message });
   }
 };
 

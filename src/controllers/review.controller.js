@@ -1,5 +1,6 @@
 const db = require("../models");
 const Reviews = db.Review;
+const redisClient = require("../utils/redis")
 
 //Add reviews for book
 exports.addReviews = async (request, response) => {
@@ -26,18 +27,30 @@ exports.getReviews = async (request, response) => {
   const bookId = request.params.id;
 
   try {
-    const reviewsData = await Reviews.find({ bookId: bookId });
+    const cacheKey = `reviews:${bookId}`;
+    const cachedReviews = await redisClient.get(cacheKey);
 
-    if (reviewsData.length === 0) {
-      return response.status(404).json({ message: 'No reviews found for this book.' });
+    if (cachedReviews) {
+      console.log("Serving reviews from Redis cache");
+      return response.status(200).json(JSON.parse(cachedReviews));
     }
 
+    const reviewsData = await Reviews.find({ bookId });
+
+    if (reviewsData.length === 0) {
+      return response.status(404).json({ message: "No reviews found for this book." });
+    }
+
+    await redisClient.set(cacheKey, JSON.stringify(reviewsData), {
+      EX: 3600, // cache for 1 hour
+    });
     response.status(200).json(reviewsData);
   } catch (error) {
-    console.error('Error fetching reviews:', error);
-    response.status(500).json({ message: 'Server error while retrieving reviews.' });
+    console.error("Error fetching reviews:", error);
+    response.status(500).json({ message: "Server error while retrieving reviews." });
   }
 };
+
 
 //Delete Review for book
 exports.deleteReview = async (request, response) => {
