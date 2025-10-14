@@ -20,11 +20,11 @@ module.exports = function (app) {
         validate([title, date, genre, description]),
         controller.addBook);
 
-    app.get(pathUrl, controller.getBooks)
+    app.get(pathUrl, controller.getBooksController)
 
     app.get(`${pathUrl}/:id`, controller.getBookById)
 
-    app.delete(`${pathUrl}/:id`, isAdmin, controller.deleteBook)
+    app.delete(`${pathUrl}/:id`,verifyToken, isAdmin, controller.deleteBook)
 
     app.put(`${pathUrl}/:id`, verifyToken, isAdmin, controller.editBookById)
 

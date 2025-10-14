@@ -76,17 +76,12 @@ exports.signin = async (request, response) => {
     const token = jwt.sign(
       { id: user._id },
       config,
-      { expiresIn: "5m" }
+      { expiresIn: "10m" }
     );
-
-    // const roles = user.roles.map(role => "ROLE_" + role.name.toUpperCase());
 
     response.status(200).send({
       message: "Signed in successfully",
       id: user._id,
-      username: user.username,
-      email: user.email,
-      roles:user.roles[0].name,
       accessToken: token
     });
   } catch (err) {

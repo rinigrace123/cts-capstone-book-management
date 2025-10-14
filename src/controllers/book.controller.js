@@ -1,4 +1,5 @@
 const db = require("../models");
+const bookService = require("../service/book.service");
 const Book = db.Book;
 const Reviews = db.Review;
 const redisClient = require("../utils/redis"); 
@@ -12,15 +13,18 @@ exports.addBook = async (request, response) => {
     const bookData = request.body;
 
     const book = new Book({
-      title: bookData.title?.trim(),
+      title: bookData.title,
       author: request.userId,
-      genre: bookData.genre?.trim(),
-      date: bookData.date?.trim(),
-      description: bookData.description?.trim()
+      genre: bookData.genre,
+      date: bookData.date,
+      description: bookData.description
     });
 
     const savedBook = await book.save();
-    response.send(savedBook);
+   response.status(200).send({
+      message: "Saved book successfully",
+      book_id: savedBook.id
+    });
   } catch (error) {
     response.status(500).send({
       message: error.message || "Some error occurred while adding the book."
@@ -29,26 +33,11 @@ exports.addBook = async (request, response) => {
 };
 
 
-exports.getBooks = async (request, response) => {
-  try {
-    const cachedBooks = await redisClient.get("books");
-
-    if (cachedBooks) {
-      return response.status(200).json(JSON.parse(cachedBooks));
-    }
-
-    const books = await Book.find();
-
-    await redisClient.set("books", JSON.stringify(books), {
-      EX: 3600, // expire in 1 hour
-    });
-
-    response.status(200).json(books);
-  } catch (error) {
-    console.error("Error in getBooks:", error);
-    response.status(500).json({ message: error.message });
-  }
+exports.getBooksController = async (request, response) => {
+  bookService.getBooks(request,response)
 };
+
+
 
 exports.getBookById = async (request, response) => {
   try {
@@ -80,7 +69,7 @@ exports.deleteBook = (request, response) => {
         });
       } else {
         response.send({
-          message: 'Tutorial was deleted'
+          message: 'Book was deleted'
         });
       }
     })
